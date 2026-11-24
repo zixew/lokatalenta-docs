@@ -1,0 +1,37 @@
+{
+  "id": "rubric-docs-baseline",
+  "title": "Documentation Hub Integration & Security Baseline Rubric",
+  "workflowName": "Documentation",
+  "ownerDivision": "devops",
+  "ownerAgentId": 12,
+  "contractRef": "cross-app-integration-contracts",
+  "backlogItemIds": ["ECO-DOCS-01", "ECO-GW-01"],
+  "criteria": [
+    {
+      "name": "REST API & SQLite FTS5 Search Contract",
+      "weight": 35,
+      "score": 35,
+      "maxScore": 35,
+      "status": "pass",
+      "evidence": "GET/POST/PUT/DELETE /api/docs, GET /api/search with FTS5 bm25 ranking, and GET/POST/PUT /api/rubrics verified."
+    },
+    {
+      "name": "Event Gateway 13-Field Telemetry & Fail-Open",
+      "weight": 35,
+      "score": 35,
+      "maxScore": 35,
+      "status": "pass",
+      "evidence": "Emits source=docs, type=doc.updated, 13-key event-schema.json payload with optional HMAC signature and 1500ms timeout."
+    },
+    {
+      "name": "XSS-Safe Markdown & Mermaid Rendering",
+      "weight": 30,
+      "score": 30,
+      "maxScore": 30,
+      "status": "pass",
+      "evidence": "react-markdown + remark-gfm without rehype-raw, strict urlTransform, and lazy-loaded Mermaid securityLevel=strict."
+    }
+  ],
+  "overallStatus": "pass",
+  "notes": "Baseline M3 readiness evaluation for lokatalenta-docs prior to M4 6-division population."
+}
