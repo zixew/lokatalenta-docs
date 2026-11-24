@@ -48,14 +48,17 @@ export function LiveSearchBar({
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
+        e.stopPropagation();
         inputRef.current?.focus();
+        inputRef.current?.select();
         setOpen(true);
       } else if (e.key === 'Escape') {
         setOpen(false);
+        inputRef.current?.blur();
       }
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
   }, []);
 
   useEffect(() => {
@@ -129,10 +132,10 @@ export function LiveSearchBar({
               setOpen(false);
             }
           }}
-          placeholder="Search docs, ADRs, contracts... (Ctrl+K)"
+          placeholder="Search docs, ADRs, contracts..."
           aria-label="Search documentation"
           data-testid="docs-search-input"
-          className="min-h-[44px] w-full rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/80 pl-9 pr-9 text-sm text-[#18181B] placeholder:text-zinc-500 focus:border-[#0F766E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]/20 dark:border-zinc-700 dark:bg-[#0D1117] dark:text-slate-100 dark:placeholder:text-slate-400 sm:min-h-[38px]"
+          className="min-h-[44px] w-full rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/80 pl-9 pr-16 text-sm text-[#18181B] placeholder:text-zinc-500 focus:border-[#0F766E] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F766E]/20 dark:border-zinc-700 dark:bg-[#0D1117] dark:text-slate-100 dark:placeholder:text-slate-400 sm:min-h-[38px]"
         />
         {query ? (
           <button
@@ -147,7 +150,14 @@ export function LiveSearchBar({
           >
             <X className="h-4 w-4" />
           </button>
-        ) : null}
+        ) : (
+          <kbd
+            onClick={() => inputRef.current?.focus()}
+            className="font-mono-tabular pointer-events-auto absolute right-2.5 hidden cursor-pointer select-none rounded border border-[#E5E3DC] bg-white px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:border-zinc-700 dark:bg-[#161B22] dark:text-slate-400 sm:inline-block"
+          >
+            ⌘K
+          </kbd>
+        )}
       </div>
 
       {open && query.trim() ? (

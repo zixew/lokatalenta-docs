@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  Check,
+  Copy,
   FileText,
+  ListTree,
   Pencil,
   Plus,
   Save,
@@ -22,7 +25,7 @@ import {
 import { Badge, type BadgeTone } from '../../shared/ui/Badge.tsx';
 import { Button } from '../../shared/ui/Button.tsx';
 import { ConfirmDialog } from '../../shared/ui/ConfirmDialog.tsx';
-import { SafeMarkdown } from '../../shared/ui/SafeMarkdown.tsx';
+import { extractHeadings, SafeMarkdown } from '../../shared/ui/SafeMarkdown.tsx';
 
 interface DocsWorkspacePageProps {
   selectedSlug: string | null;
@@ -73,6 +76,9 @@ export function DocsWorkspacePage({
   const [editorMode, setEditorMode] = useState<'none' | 'create' | 'edit'>('none');
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
+  const [mobileTocOpen, setMobileTocOpen] = useState(false);
 
   const [slugInput, setSlugInput] = useState('');
   const [titleInput, setTitleInput] = useState('');
@@ -231,6 +237,36 @@ export function DocsWorkspacePage({
 
   const authorAgent = activeDoc ? agentsById.get(activeDoc.authorAgentId) : undefined;
   const ownerDivision = activeDoc ? divisionsById.get(activeDoc.divisionId) : undefined;
+  const headings = useMemo(
+    () => (activeDoc ? extractHeadings(activeDoc.content) : []),
+    [activeDoc],
+  );
+
+  useEffect(() => {
+    setCopied(false);
+    setActiveHeadingId(headings[0]?.id ?? null);
+    setMobileTocOpen(false);
+  }, [activeDoc?.slug, headings]);
+
+  async function handleCopyMarkdown() {
+    if (!activeDoc) return;
+    try {
+      await navigator.clipboard.writeText(activeDoc.content);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable in non-secure context
+    }
+  }
+
+  function jumpToHeading(id: string) {
+    setActiveHeadingId(id);
+    setMobileTocOpen(false);
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -564,7 +600,25 @@ export function DocsWorkspacePage({
                     {activeDoc.title}
                   </h2>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => void handleCopyMarkdown()}
+                    data-testid="doc-copy-md-btn"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" />
+                        Copy MD
+                      </>
+                    )}
+                  </Button>
                   <Button
                     variant="secondary"
                     size="sm"
@@ -616,8 +670,93 @@ export function DocsWorkspacePage({
               ) : null}
             </header>
 
-            <div className="mt-5">
+            {headings.length > 0 ? (
+              <div className="mt-4 xl:hidden">
+                <button
+                  type="button"
+                  onClick={() => setMobileTocOpen((o) => !o)}
+                  data-testid="doc-outline-toggle"
+                  className="inline-flex w-full items-center justify-between rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/70 px-3 py-2 text-xs font-semibold text-zinc-700 dark:border-zinc-800 dark:bg-[#0D1117] dark:text-slate-300"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <ListTree className="h-3.5 w-3.5 text-[#0F766E] dark:text-teal-400" />
+                    On This Page ({headings.length})
+                  </span>
+                  <span className="font-mono-tabular text-[11px] text-zinc-500">
+                    {mobileTocOpen ? 'Hide' : 'Jump'}
+                  </span>
+                </button>
+                {mobileTocOpen ? (
+                  <nav
+                    aria-label="Document outline"
+                    className="mt-2 rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/40 p-2.5 dark:border-zinc-800 dark:bg-[#0D1117]"
+                  >
+                    <ul className="space-y-1">
+                      {headings.map((h) => (
+                        <li key={h.id}>
+                          <button
+                            type="button"
+                            onClick={() => jumpToHeading(h.id)}
+                            className={`w-full rounded px-2 py-1 text-left text-xs transition-colors ${
+                              h.level === 3 ? 'pl-5' : ''
+                            } ${
+                              activeHeadingId === h.id
+                                ? 'bg-teal-50 font-semibold text-[#0F766E] dark:bg-teal-950/60 dark:text-teal-300'
+                                : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-slate-400 dark:hover:bg-zinc-800 dark:hover:text-slate-100'
+                            }`}
+                          >
+                            {h.text}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                ) : null}
+              </div>
+            ) : null}
+
+            <div
+              className={`mt-5 ${
+                headings.length > 0
+                  ? 'xl:grid xl:grid-cols-[minmax(0,1fr)_210px] xl:gap-6'
+                  : ''
+              }`}
+            >
               <SafeMarkdown content={activeDoc.content} />
+
+              {headings.length > 0 ? (
+                <aside className="hidden xl:block">
+                  <nav
+                    aria-label="Document outline"
+                    data-testid="doc-outline-nav"
+                    className="sticky top-28 rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/60 p-3 dark:border-zinc-800 dark:bg-[#0D1117]"
+                  >
+                    <div className="mb-2 flex items-center gap-1.5 border-b border-[#E5E3DC] pb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:text-slate-400">
+                      <ListTree className="h-3.5 w-3.5 text-[#0F766E] dark:text-teal-400" />
+                      Outline
+                    </div>
+                    <ul className="max-h-[60vh] space-y-1 overflow-y-auto pr-1">
+                      {headings.map((h) => (
+                        <li key={h.id}>
+                          <button
+                            type="button"
+                            onClick={() => jumpToHeading(h.id)}
+                            className={`w-full rounded px-2 py-1 text-left text-xs leading-snug transition-colors ${
+                              h.level === 3 ? 'pl-4 text-[11px]' : 'font-medium'
+                            } ${
+                              activeHeadingId === h.id
+                                ? 'border-l-2 border-[#0F766E] bg-teal-50/80 font-semibold text-[#0F766E] dark:border-teal-400 dark:bg-teal-950/50 dark:text-teal-300'
+                                : 'text-zinc-600 hover:bg-white hover:text-zinc-900 dark:text-slate-400 dark:hover:bg-zinc-800/70 dark:hover:text-slate-100'
+                            }`}
+                          >
+                            {h.text}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                </aside>
+              ) : null}
             </div>
           </article>
         ) : (

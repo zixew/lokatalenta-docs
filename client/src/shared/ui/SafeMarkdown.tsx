@@ -1,29 +1,118 @@
+import { isValidElement, useMemo, type ReactNode } from 'react';
 import Markdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { isSafeMarkdownUrl } from '../lib/securityGuards.ts';
 import { MermaidDiagram } from './MermaidDiagram.tsx';
+
+export interface DocHeading {
+  level: 2 | 3;
+  text: string;
+  id: string;
+}
+
+function slugifyHeading(text: string): string {
+  return (
+    text
+      .toLowerCase()
+      .replace(/[`*_~[\]()]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'section'
+  );
+}
+
+function createHeadingSlugger() {
+  const seen = new Map<string, number>();
+  return (text: string): string => {
+    const base = slugifyHeading(text);
+    const count = (seen.get(base) ?? 0) + 1;
+    seen.set(base, count);
+    return count === 1 ? base : `${base}-${count}`;
+  };
+}
+
+function extractNodeText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(extractNodeText).join('');
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return extractNodeText(node.props.children);
+  }
+  return '';
+}
+
+/** Parse level-2 and level-3 markdown headings outside fenced code blocks. */
+export function extractHeadings(markdown: string): DocHeading[] {
+  const headings: DocHeading[] = [];
+  const nextSlug = createHeadingSlugger();
+  let inFence = false;
+
+  for (const rawLine of markdown.split(/\r?\n/)) {
+    const trimmed = rawLine.trim();
+    if (/^(`{3,}|~{3,})/.test(trimmed)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+
+    const match = /^(#{2,3})\s+(.+?)\s*#*\s*$/.exec(trimmed);
+    if (!match) continue;
+    const level = match[1].length as 2 | 3;
+    const text = match[2].replace(/[`*_~]/g, '').trim();
+    if (!text) continue;
+    headings.push({ level, text, id: nextSlug(text) });
+  }
+  return headings;
+}
 
 interface SafeMarkdownProps {
   content: string;
   className?: string;
 }
 
-const MARKDOWN_COMPONENTS: Components = {
-  h1: ({ children }) => (
-    <h1 className="mb-4 mt-2 border-b border-[#E5E3DC] pb-2 text-2xl font-bold text-[#18181B] dark:border-zinc-800 dark:text-slate-100">
-      {children}
-    </h1>
-  ),
-  h2: ({ children }) => (
-    <h2 className="mb-3 mt-6 text-xl font-semibold text-[#18181B] dark:text-slate-100">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="mb-2 mt-5 text-base font-semibold text-[#18181B] dark:text-slate-100">
-      {children}
-    </h3>
-  ),
+function createMarkdownComponents(): Components {
+  const nextSlug = createHeadingSlugger();
+
+  return {
+    h1: ({ children }) => (
+      <h1 className="mb-4 mt-2 border-b border-[#E5E3DC] pb-2 text-2xl font-bold text-[#18181B] dark:border-zinc-800 dark:text-slate-100">
+        {children}
+      </h1>
+    ),
+    h2: ({ children }) => {
+      const id = nextSlug(extractNodeText(children));
+      return (
+        <h2
+          id={id}
+          className="group mb-3 mt-6 scroll-mt-24 text-xl font-semibold text-[#18181B] dark:text-slate-100"
+        >
+          {children}
+          <a
+            href={`#${id}`}
+            aria-label="Link to section"
+            className="ml-2 text-sm font-normal text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-[#0F766E] dark:text-slate-500 dark:hover:text-teal-400"
+          >
+            #
+          </a>
+        </h2>
+      );
+    },
+    h3: ({ children }) => {
+      const id = nextSlug(extractNodeText(children));
+      return (
+        <h3
+          id={id}
+          className="group mb-2 mt-5 scroll-mt-24 text-base font-semibold text-[#18181B] dark:text-slate-100"
+        >
+          {children}
+          <a
+            href={`#${id}`}
+            aria-label="Link to subsection"
+            className="ml-1.5 text-xs font-normal text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-[#0F766E] dark:text-slate-500 dark:hover:text-teal-400"
+          >
+            #
+          </a>
+        </h3>
+      );
+    },
   p: ({ children }) => (
     <p className="my-3 text-sm leading-7 text-zinc-700 dark:text-slate-300">
       {children}
@@ -125,15 +214,17 @@ const MARKDOWN_COMPONENTS: Components = {
       </code>
     );
   },
-};
+  };
+}
 
 export function SafeMarkdown({ content, className = '' }: SafeMarkdownProps) {
+  const components = useMemo(() => createMarkdownComponents(), [content]);
   return (
     <div className={`min-w-0 break-words ${className}`} data-testid="safe-markdown">
       <Markdown
         remarkPlugins={[remarkGfm]}
         urlTransform={(url) => (isSafeMarkdownUrl(url) ? url : '')}
-        components={MARKDOWN_COMPONENTS}
+        components={components}
       >
         {content}
       </Markdown>
