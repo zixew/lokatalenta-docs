@@ -75,10 +75,10 @@ export function DocsHubShell() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-clip bg-[#F6F5F1] text-[#18181B] dark:bg-[#0D1117] dark:text-slate-100">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-[#F3F3F0] text-[#0E1015] dark:bg-[#0E1015] dark:text-slate-100">
       <EcosystemSwitcher />
 
-      <header className="sticky top-0 z-30 border-b border-[#E5E3DC] bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-[#161B22]/95">
+      <header className="sticky top-0 z-30 border-b border-[#D4D4CE] bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-[#161B24]/95">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex min-w-0 items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-2.5">
@@ -86,7 +86,7 @@ export function DocsHubShell() {
                 <BookOpen className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-base font-extrabold tracking-tight text-[#18181B] dark:text-slate-100">
+                <h1 className="text-base font-extrabold tracking-tight text-[#0E1015] dark:text-slate-100">
                   LokaTalenta Docs Hub
                 </h1>
                 <p className="text-[11px] text-zinc-500 dark:text-slate-400">
@@ -100,7 +100,7 @@ export function DocsHubShell() {
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               data-testid="theme-toggle-btn"
-              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[#E5E3DC] bg-white text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-[#0D1117] dark:text-slate-200 dark:hover:bg-zinc-800 lg:hidden"
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[#D4D4CE] bg-white text-zinc-700 hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:bg-[#0E1015] dark:text-slate-200 dark:hover:bg-zinc-800 lg:hidden"
             >
               {theme === 'dark' ? (
                 <Sun className="h-4 w-4" />
@@ -124,7 +124,7 @@ export function DocsHubShell() {
               type="button"
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              className="hidden min-h-[38px] min-w-[38px] items-center justify-center rounded-lg border border-[#E5E3DC] bg-white text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-[#0D1117] dark:text-slate-200 dark:hover:bg-zinc-800 lg:inline-flex"
+              className="hidden min-h-[38px] min-w-[38px] items-center justify-center rounded-lg border border-[#D4D4CE] bg-white text-zinc-700 hover:bg-zinc-100 active:scale-[0.98] dark:border-zinc-700 dark:bg-[#0E1015] dark:text-slate-200 dark:hover:bg-zinc-800 lg:inline-flex"
             >
               {theme === 'dark' ? (
                 <Sun className="h-4 w-4" />
@@ -135,27 +135,29 @@ export function DocsHubShell() {
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-7xl items-center gap-1.5 overflow-x-auto border-t border-[#E5E3DC] px-4 py-2 dark:border-zinc-800 sm:px-6">
-          {navTabs.map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                data-testid={tab.testId}
-                onClick={() => setActiveTab(tab.id)}
-                className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-200 ease-out sm:min-h-[36px] ${
-                  active
-                    ? 'border-[#0F766E]/30 bg-teal-50 text-[#0F766E] dark:border-teal-700 dark:bg-teal-950/60 dark:text-teal-300'
-                    : 'border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-slate-400 dark:hover:bg-zinc-800 dark:hover:text-slate-100'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        <div className="mx-auto flex max-w-7xl items-center gap-1.5 overflow-x-auto border-t border-[#D4D4CE] px-4 py-2 dark:border-zinc-800 sm:px-6">
+          <div className="inline-flex items-center gap-1 rounded-xl bg-[#EAEAE4] p-1 dark:bg-zinc-900/80">
+            {navTabs.map((tab) => {
+              const Icon = tab.icon;
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  data-testid={tab.testId}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-150 ease-out active:scale-[0.98] sm:min-h-[34px] ${
+                    active
+                      ? 'border border-[#D4D4CE]/80 bg-white text-[#0F766E] shadow-xs dark:border-zinc-700 dark:bg-[#161B24] dark:text-teal-300'
+                      : 'border-transparent text-zinc-600 hover:text-zinc-900 dark:text-slate-400 dark:hover:text-slate-100'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </header>
 
@@ -186,7 +188,7 @@ export function DocsHubShell() {
         {activeTab === 'rubrics' ? <RubricEvaluatorPage agents={agents} /> : null}
       </main>
 
-      <footer className="border-t border-[#E5E3DC] bg-white/80 py-3 text-xs text-zinc-500 dark:border-zinc-800 dark:bg-[#161B22]/80 dark:text-slate-400">
+      <footer className="border-t border-[#D4D4CE] bg-white/80 py-3 text-xs text-zinc-500 dark:border-zinc-800 dark:bg-[#161B24]/80 dark:text-slate-400">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 sm:px-6">
           <span>LokaTalenta Documentation Hub · SQLite FTS5 + Event Gateway</span>
           <span className="font-mono-tabular">API :4104 · Dev :4114 · 24 Agents</span>
