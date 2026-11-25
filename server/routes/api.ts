@@ -17,6 +17,7 @@ import {
 } from '../domain/validation.ts';
 import { emitGatewayEvent, type GatewayEmitterConfig } from '../gateway/emitter.ts';
 import { DocsStore, DuplicateKeyError } from '../store/docsStore.ts';
+import { docsTursoAdapter } from '../store/tursoAdapter.ts';
 
 export interface ApiRouterDeps {
   store: DocsStore;
@@ -27,12 +28,14 @@ export interface ApiRouterDeps {
 export function createApiRouter(deps: ApiRouterDeps): Router {
   const router = Router();
 
-  router.get('/health', (_req, res) => {
+  router.get('/health', async (_req, res) => {
+    const tursoHealth = await docsTursoAdapter.checkHealth();
     res.status(200).json({
       ok: true,
       service: 'lokatalenta-docs',
       port: deps.port,
       persistence: process.env.VERCEL === '1' ? 'ephemeral-tmp-seeded' : 'local-sqlite',
+      turso: tursoHealth,
       timestamp: new Date().toISOString(),
     });
   });
