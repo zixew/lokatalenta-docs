@@ -75,13 +75,13 @@ export function DocsHubShell() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F6F5F1] text-[#18181B] dark:bg-[#0D1117] dark:text-slate-100">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-[#F6F5F1] text-[#18181B] dark:bg-[#0D1117] dark:text-slate-100">
       <EcosystemSwitcher />
 
       <header className="sticky top-0 z-30 border-b border-[#E5E3DC] bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-[#161B22]/95">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
+          <div className="flex min-w-0 items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#0F766E]/20 bg-teal-50 text-[#0F766E] dark:border-teal-800 dark:bg-teal-950/60 dark:text-teal-300">
                 <BookOpen className="h-5 w-5" />
               </div>
@@ -159,7 +159,7 @@ export function DocsHubShell() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
+      <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-4 py-6 sm:px-6">
         {activeTab === 'docs' ? (
           <DocsWorkspacePage
             selectedSlug={selectedSlug}

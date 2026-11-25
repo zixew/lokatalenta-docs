@@ -174,6 +174,11 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
           </pre>
         ) : (
           <div className="overflow-auto p-4">
+            {status === 'loading' ? (
+              <p className="text-xs text-zinc-500 dark:text-slate-400">
+                Rendering diagram...
+              </p>
+            ) : null}
             <div
               ref={containerRef}
               data-testid="mermaid-diagram"
@@ -186,13 +191,7 @@ export function MermaidDiagram({ chart }: MermaidDiagramProps) {
                   : undefined
               }
               className="transition-transform duration-150 ease-out [&_svg]:mx-auto [&_svg]:max-w-full"
-            >
-              {status === 'loading' ? (
-                <p className="text-xs text-zinc-500 dark:text-slate-400">
-                  Rendering diagram...
-                </p>
-              ) : null}
-            </div>
+            />
           </div>
         )}
       </div>

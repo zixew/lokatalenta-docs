@@ -60,6 +60,7 @@ describe('Vercel serverless readiness (DB_PATH fallback, CORS_ORIGINS, api/index
     const health = await request(app).get('/api/health');
     expect(health.status).toBe(200);
     expect(health.body.ok).toBe(true);
+    expect(health.body.persistence).toBe('ephemeral-tmp-seeded');
 
     const docs = await request(app).get('/api/docs');
     expect(docs.status).toBe(200);

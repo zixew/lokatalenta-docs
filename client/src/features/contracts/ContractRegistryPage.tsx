@@ -118,7 +118,7 @@ export function ContractRegistryPage({ ports }: ContractRegistryPageProps) {
       </section>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <div className="rounded-xl border border-[#E5E3DC] bg-white p-5 dark:border-zinc-800 dark:bg-[#161B22] lg:col-span-7">
+        <div className="min-w-0 rounded-xl border border-[#E5E3DC] bg-white p-5 dark:border-zinc-800 dark:bg-[#161B22] lg:col-span-7">
           <h3 className="text-base font-bold text-[#18181B] dark:text-slate-100">
             13-Field Telemetry Contract (`event-schema.json`)
           </h3>

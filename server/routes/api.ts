@@ -32,6 +32,7 @@ export function createApiRouter(deps: ApiRouterDeps): Router {
       ok: true,
       service: 'lokatalenta-docs',
       port: deps.port,
+      persistence: process.env.VERCEL === '1' ? 'ephemeral-tmp-seeded' : 'local-sqlite',
       timestamp: new Date().toISOString(),
     });
   });

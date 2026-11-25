@@ -271,7 +271,7 @@ export function DocsWorkspacePage({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       {/* Sidebar Directory */}
-      <aside className="lg:col-span-4 xl:col-span-3">
+      <aside className="min-w-0 lg:col-span-4 xl:col-span-3">
         <div className="rounded-xl border border-[#E5E3DC] bg-white p-4 dark:border-zinc-800 dark:bg-[#161B22]">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-[#18181B] dark:text-slate-100">
@@ -382,7 +382,7 @@ export function DocsWorkspacePage({
       </aside>
 
       {/* Main Viewer / Split-Pane Editor */}
-      <section className="lg:col-span-8 xl:col-span-9">
+      <section className="min-w-0 lg:col-span-8 xl:col-span-9">
         {editorMode !== 'none' ? (
           <form
             onSubmit={handleSubmit}
@@ -556,7 +556,7 @@ export function DocsWorkspacePage({
 
             {/* Split-pane Markdown & Live Preview */}
             <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
-              <div>
+              <div className="min-w-0">
                 <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-slate-300">
                   Markdown Source
                 </label>
@@ -569,11 +569,11 @@ export function DocsWorkspacePage({
                   className="w-full rounded-lg border border-[#E5E3DC] p-3 font-mono text-xs leading-relaxed dark:border-zinc-700"
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <span className="mb-1 block text-xs font-medium text-zinc-700 dark:text-slate-300">
                   Live Safe Preview
                 </span>
-                <div className="h-[396px] overflow-y-auto rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/40 p-4 dark:border-zinc-700 dark:bg-[#0D1117]">
+                <div className="h-[396px] overflow-y-auto overflow-x-hidden rounded-lg border border-[#E5E3DC] bg-[#F6F5F1]/40 p-4 dark:border-zinc-700 dark:bg-[#0D1117]">
                   <SafeMarkdown content={contentInput} />
                 </div>
               </div>
@@ -582,7 +582,7 @@ export function DocsWorkspacePage({
         ) : activeDoc ? (
           <article
             data-testid="doc-viewer"
-            className="rounded-xl border border-[#E5E3DC] bg-white p-6 dark:border-zinc-800 dark:bg-[#161B22]"
+            className="min-w-0 overflow-hidden rounded-xl border border-[#E5E3DC] bg-white p-4 dark:border-zinc-800 dark:bg-[#161B22] sm:p-6"
           >
             <header className="border-b border-[#E5E3DC] pb-4 dark:border-zinc-800">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -592,7 +592,7 @@ export function DocsWorkspacePage({
                     <Badge tone={STATUS_TONE[activeDoc.status]}>
                       {activeDoc.status}
                     </Badge>
-                    <span className="font-mono-tabular text-xs text-zinc-500 dark:text-slate-400">
+                    <span className="font-mono-tabular break-all text-xs text-zinc-500 dark:text-slate-400">
                       /{activeDoc.slug}
                     </span>
                   </div>
@@ -697,7 +697,7 @@ export function DocsWorkspacePage({
                           <button
                             type="button"
                             onClick={() => jumpToHeading(h.id)}
-                            className={`w-full rounded px-2 py-1 text-left text-xs transition-colors ${
+                            className={`w-full break-words rounded px-2 py-1 text-left text-xs transition-colors ${
                               h.level === 3 ? 'pl-5' : ''
                             } ${
                               activeHeadingId === h.id
@@ -716,7 +716,7 @@ export function DocsWorkspacePage({
             ) : null}
 
             <div
-              className={`mt-5 ${
+              className={`mt-5 min-w-0 ${
                 headings.length > 0
                   ? 'xl:grid xl:grid-cols-[minmax(0,1fr)_210px] xl:gap-6'
                   : ''

@@ -135,7 +135,7 @@ function createMarkdownComponents(): Components {
     </blockquote>
   ),
   table: ({ children }) => (
-    <div className="my-4 overflow-x-auto rounded-lg border border-[#E5E3DC] dark:border-zinc-800">
+    <div className="my-4 w-full max-w-full overflow-x-auto rounded-lg border border-[#E5E3DC] dark:border-zinc-800">
       <table className="w-full border-collapse text-left text-xs sm:text-sm">
         {children}
       </table>
@@ -202,14 +202,14 @@ function createMarkdownComponents(): Components {
     const isBlock = Boolean(language) || raw.includes('\n');
     if (isBlock) {
       return (
-        <pre className="my-3 overflow-x-auto rounded-lg border border-[#E5E3DC] bg-[#0D1117] p-3.5 font-mono text-xs leading-relaxed text-slate-100 dark:border-zinc-800">
+        <pre className="my-3 w-full max-w-full overflow-x-auto rounded-lg border border-[#E5E3DC] bg-[#0D1117] p-3.5 font-mono text-xs leading-relaxed text-slate-100 dark:border-zinc-800">
           <code>{raw}</code>
         </pre>
       );
     }
 
     return (
-      <code className="rounded border border-[#E5E3DC] bg-[#F6F5F1] px-1.5 py-0.5 font-mono text-xs text-[#0F766E] dark:border-zinc-700 dark:bg-zinc-800 dark:text-teal-300">
+      <code className="break-words rounded border border-[#E5E3DC] bg-[#F6F5F1] px-1.5 py-0.5 font-mono text-xs text-[#0F766E] dark:border-zinc-700 dark:bg-zinc-800 dark:text-teal-300">
         {raw}
       </code>
     );
@@ -220,7 +220,7 @@ function createMarkdownComponents(): Components {
 export function SafeMarkdown({ content, className = '' }: SafeMarkdownProps) {
   const components = useMemo(() => createMarkdownComponents(), [content]);
   return (
-    <div className={`min-w-0 break-words ${className}`} data-testid="safe-markdown">
+    <div className={`w-full min-w-0 break-words ${className}`} data-testid="safe-markdown">
       <Markdown
         remarkPlugins={[remarkGfm]}
         urlTransform={(url) => (isSafeMarkdownUrl(url) ? url : '')}
